@@ -2,7 +2,9 @@ title: Fruit2048-A
 description: Fruit based 2048 game.
 author: hurghdragon
 splash:
-  file: assets/meta-splash.png
+  file: assets/no-image.png
 icon:
-  file: assets/meta-icon.png
+  file: assets/no-icon.png
 version: v1.2.0
+category: game # game, demo, utility, ...
+url: https://github.com/hurghdragon/32blit-2048
