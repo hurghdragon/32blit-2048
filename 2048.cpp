@@ -13,6 +13,7 @@ using namespace blit;
 /* setup */
 void init() {
   // "asset_dingbads" is the asset name defined in assets.yml
+  set_screen_mode(ScreenMode::hires);
   screen.sprites = SpriteSheet::load(asset_dingbads);
   if(read_save(score_data,0)) {
     // Loaded sucessfully!
@@ -41,21 +42,20 @@ void render(uint32_t time_ms) {
   screen.rectangle(Rect(0, 0, 320, 14));
 
   screen.pen = Pen(0, 0, 0);
-  screen.text("2048 demo", minimal_font, Point(5, 4));
+  screen.text("2048 Tilt", minimal_font, Point(5, 4));
   
   // draw score box
   screen.pen = Pen(48, 48, 96);
-  screen.rectangle(Rect(120, 14, 320, 240));
+  screen.rectangle(Rect(240, 14, 320, 240));
 
   screen.pen = Pen(207, 207, 159);
-  screen.text("Score", minimal_font, Point(125, 18));	
+  screen.text("Score", minimal_font, Point(250, 18));	
   std::string sc = std::to_string(game_data.score);
-  screen.text(sc, minimal_font, Point(130, 28));
-  screen.text("High", minimal_font, Point(125, 52));
-    screen.text("score", minimal_font, Point(130, 60));	
+  screen.text(sc, minimal_font, Point(260, 28));
+  screen.text("High score", minimal_font, Point(250, 52));
 	
   sc = std::to_string(score_data.highscore);
-  screen.text(sc, minimal_font, Point(130, 70));		
+  screen.text(sc, minimal_font, Point(260, 60));		
 
   uint32_t ms_start = now();
   uint32_t t;
@@ -67,9 +67,9 @@ void render(uint32_t time_ms) {
   for (int x = 0; x < 4; x++) {
     for (int y = 0; y < 4; y++) {
       if (game_data.board[x+y*4]>0) {
-		  t=game_data.board[x+y*4]*8;
+		  t=game_data.board[x+y*4]*16;
 //        screen.sprite(game_data.board[x+y*4], Point(25*x+15, 25*y+20));
-          screen.stretch_blit(screen.sprites, Rect(t, 0,8, 8), Rect(22*x+14, 21*y+24, 20, 20));
+          screen.stretch_blit(screen.sprites, Rect(t, 0,16, 16), Rect(44*x+14, 42*y+24, 40, 40));
 //          screen.stretch_blit(screen.sprites, Rect(t, 0,8, 8), Rect(25, 25, 16, 16));
 
       }
@@ -81,10 +81,10 @@ void render(uint32_t time_ms) {
   // draw FPS meter
   screen.alpha = 255;
   screen.pen = Pen(255, 255, 255, 100);
-  screen.rectangle(Rect(1, 120 - 10, 12, 9));
+  screen.rectangle(Rect(1, 240 - 10, 12, 9));
   screen.pen = Pen(255, 255, 255, 200);
   std::string fms = std::to_string(ms_end - ms_start);
-  screen.text(fms, minimal_font, Rect(3, 120 - 9, 10, 16));
+  screen.text(fms, minimal_font, Rect(3, 240 - 9, 10, 8));
 //  printf("FMS %s",fms);
 	
   int block_size = 4;
@@ -101,11 +101,37 @@ void update(uint32_t time) {
 	move(0,1);
 	printf("Board moved = %d",boardmoved);
   }
+  if (joystick.y<-0.5 && moveup==false) {
+	moveup=true;
+	move(0,1);
+	printf("Board moved = %d",boardmoved);
+  }
+  if (tilt.y<-0.5 && moveup==false) {
+	moveup=true;
+	move(0,1);
+	printf("Board moved = %d",boardmoved);
+  }
   if (pressed(Button::DPAD_DOWN) && movedown==false) {
 	movedown=true;
     move(0,-1);
   }
+  if (joystick.y>0.5 && movedown==false) {
+	movedown=true;
+    move(0,-1);
+  }
+  if (tilt.y>0.5 && movedown==false) {
+	movedown=true;
+    move(0,-1);
+  }
   if (pressed(Button::DPAD_LEFT) && moveleft==false) {
+	moveleft=true;
+	move(1,0);
+  }
+  if (joystick.x<-0.5 && moveleft==false) {
+	moveleft=true;
+	move(1,0);
+  }
+  if (tilt.x<-0.5 && moveleft==false) {
 	moveleft=true;
 	move(1,0);
   }
@@ -116,6 +142,14 @@ void update(uint32_t time) {
 	homepress=true;
   }
   if (pressed(Button::DPAD_RIGHT) && moveright==false) {
+	moveright=true;
+    move(-1,0);
+  }
+  if (joystick.x>0.5 && moveright==false) {
+	moveright=true;
+    move(-1,0);
+  }
+  if (tilt.x>0.5 && moveright==false) {
 	moveright=true;
     move(-1,0);
   }
@@ -131,6 +165,16 @@ void update(uint32_t time) {
     add_piece();
 
   }
+  if (joystick.y > -0.5 && joystick.y < 0.5 && (movedown==true || moveup==true)){
+    movedown=false;
+    moveup=false;
+    add_piece();
+  }
+  if (tilt.y > -0.5 && tilt.y < 0.5 && (movedown==true || moveup==true)){
+    movedown=false;
+    moveup=false;
+    add_piece();
+  }
   if (pressed(Button::DPAD_LEFT)==false && moveleft==true) {
 //    printf("Release: Left\n");
     moveleft=false;
@@ -140,6 +184,16 @@ void update(uint32_t time) {
   if (pressed(Button::DPAD_RIGHT)==false && moveright==true) {
 //    printf("Release: Right\n");
     moveright=false;
+    add_piece();
+  }
+  if (joystick.x > -0.5 && joystick.x < 0.5 && (moveright==true || moveleft==true)){
+    moveright=false;
+    moveleft=false;
+    add_piece();
+  }
+  if (tilt.x > -0.5 && tilt.x < 0.5 && (moveright==true || moveleft==true)){
+    moveright=false;
+    moveleft=false;
     add_piece();
   }
   if (pressed(Button::MENU)==false && menupress==true) {
