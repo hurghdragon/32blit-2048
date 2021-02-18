@@ -1,0 +1,8 @@
+#!/bin/bash
+
+sdk=~/32blit/32blit-sdk
+
+mkdir build
+cd build
+cmake .. -D32BLIT_DIR=$sdk
+make

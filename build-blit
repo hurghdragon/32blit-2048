@@ -1,0 +1,8 @@
+#!/bin/bash
+
+sdk=~/32blit/32blit-sdk
+
+mkdir build.stm32
+cd build.stm32
+cmake .. -D32BLIT_DIR=$sdk  -DCMAKE_TOOLCHAIN_FILE=$sdk/32blit.toolchain
+make
